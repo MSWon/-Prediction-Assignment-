@@ -6,16 +6,14 @@ library(plyr)
 library(randomForest)
 library(rpart)
 
-## read data ##
+# read data 
 training.file <- read.csv("pml-training.csv")
 testing.file <- read.csv("pml-testing.csv")
 
-
-## column location of the NA's ##
+# column location of the NA's 
 
 i <- 1
 col.location <- integer()
-
 while(i <= length(names(testing.file))){
   
       if(identical(testing.file[1,i],NA)==TRUE){
@@ -25,33 +23,30 @@ while(i <= length(names(testing.file))){
       i <- i + 1
 }
 
-## Partioning training.file data set into two data sets, 60% for training, 40% for testing ##
+# Partioning training.file data set into two data sets, 60% for training, 40% for testing 
 
 inTrain <- createDataPartition(training.file$classe , p = 0.6 , list = FALSE)
 training <- training.file[inTrain,]
 testing <- training.file[-inTrain,]
 
-## Deleting the NA columns ##
-
+# Deleting the NA columns 
 training <- training[,-col.location]
 testing <- testing[,-col.location]
-## Deleting the 1,2 columns ##
-
+# Deleting the 1,2 columns 
 training <- training[,-c(1,2)]
 testing<- testing[,-c(1,2)]
-
-## Using randomForest method ##
+# Using randomForest method 
 modFit.1 <- randomForest(classe ~., data = training)
-## Using Decision Tree method ##
+#Using Decision Tree method 
 modFit.2 <- rpart(classe ~ ., data = training, method="class")
-## Using lda method ##
+# Using lda method 
 modFit.3 <- train(classe ~ ., data = training , method = "lda")
 
-## randomForest method accuracy : 0.9988529 ##
+# randomForest method accuracy : 0.9988529 
 confusionMatrix(predict(modFit.1 , testing , type ="class") , testing$classe)$overall['Accuracy']
-## Decision Tree method accuracy : 0.8767525 ##
+# Decision Tree method accuracy : 0.8767525 
 confusionMatrix(predict(modFit.2 , testing , type ="class") , testing$classe)$overall['Accuracy']
-## lda method accuracy : 0.8522814 ##
+# lda method accuracy : 0.8522814 
 confusionMatrix(predict(modFit.3 , testing) , testing$classe)$overall['Accuracy']
 
-## so the best model is the randomForest method ##
+#so the best model is the randomForest method 
