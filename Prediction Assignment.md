@@ -1,17 +1,19 @@
 # -Prediction-Assignment-
  Prediction Assignment for Coursera
 
+```{r}
 library(caret)
 library(plyr)
 library(randomForest)
 library(rpart)
-
-# read data 
+```
+read data 
+```{r}
 training.file <- read.csv("pml-training.csv")
 testing.file <- read.csv("pml-testing.csv")
-
-# column location of the NA's 
-
+```
+ column location of the NA's 
+```{r}
 i <- 1
 col.location <- integer()
 while(i <= length(names(testing.file))){
@@ -22,31 +24,41 @@ while(i <= length(names(testing.file))){
       }
       i <- i + 1
 }
-
-# Partioning training.file data set into two data sets, 60% for training, 40% for testing 
-
+```
+#Partioning training.file data set into two data sets, 60% for training, 40% for testing 
+```{r}
 inTrain <- createDataPartition(training.file$classe , p = 0.6 , list = FALSE)
 training <- training.file[inTrain,]
 testing <- training.file[-inTrain,]
-
-# Deleting the NA columns 
+```
+Deleting the NA columns 
+```{r}
 training <- training[,-col.location]
 testing <- testing[,-col.location]
-# Deleting the 1,2 columns 
+```
+Deleting the 1,2 columns 
+```{r}
 training <- training[,-c(1,2)]
 testing<- testing[,-c(1,2)]
+```
 # Using randomForest method 
+```{r}
 modFit.1 <- randomForest(classe ~., data = training)
-#Using Decision Tree method 
-modFit.2 <- rpart(classe ~ ., data = training, method="class")
-# Using lda method 
-modFit.3 <- train(classe ~ ., data = training , method = "lda")
-
-# randomForest method accuracy : 0.9988529 
 confusionMatrix(predict(modFit.1 , testing , type ="class") , testing$classe)$overall['Accuracy']
-# Decision Tree method accuracy : 0.8767525 
+```
+0.9988529
+#Using Decision Tree method 
+```{r}
+modFit.2 <- rpart(classe ~ ., data = training, method="class")
 confusionMatrix(predict(modFit.2 , testing , type ="class") , testing$classe)$overall['Accuracy']
-# lda method accuracy : 0.8522814 
+```
+0.8767525 
+# Using lda method 
+```{r}
+modFit.3 <- train(classe ~ ., data = training , method = "lda")
 confusionMatrix(predict(modFit.3 , testing) , testing$classe)$overall['Accuracy']
+```
+0.8522814 
 
-#so the best model is the randomForest method 
+#conclusion
+so the best model is the randomForest method 
