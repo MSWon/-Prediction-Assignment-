@@ -62,6 +62,7 @@ ouf of sample error is
 ```{r}
 1-as.numeric(confusionMatrix(predict(modFit.1 , testing , type ="class") , testing$classe)$overall['Accuracy'])
 ```
+0.000509684
 #Using Decision Tree method
 ```{r}
 modFit.2 <- rpart(classe ~ ., data = training, method="class")
@@ -71,6 +72,7 @@ ouf of sample error is
 ```{r}
 1-as.numeric(confusionMatrix(predict(modFit.2 , testing , type ="class") , testing$classe)$overall['Accuracy'])
 ```
+0.1325178
 #Using lda method
 ```{r}
 modFit.3 <- train(classe ~ ., data = training , method = "lda")
@@ -80,6 +82,7 @@ ouf of sample error is
 ```{r}
 1-as.numeric(confusionMatrix(predict(modFit.3 , testing) , testing$classe)$overall['Accuracy'])
 ```
+0.1523955
 #4. Conclusion 
 Since the out of sample error of random forest model is the smallest of all three models, we can see the 
 random forest model best fit in this case.
