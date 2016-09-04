@@ -1,0 +1,85 @@
+---
+title: "Coursera Assignment"
+author: "Minsub"
+date: "2016-09-04"
+output: html_document
+---
+
+#1. Preparing Data
+Loading library
+```{r}
+library(caret)
+library(plyr)
+library(randomForest)
+library(rpart)
+```
+Read data
+```{r}
+setwd("C:/Users/Big Data Guru/Desktop/코세라")
+training.file <- read.csv("pml-training.csv")
+testing.file <- read.csv("pml-testing.csv")
+```
+#2. Data cleaning
+Column location of the NA's 
+```{r}
+i <- 1
+col.location <- integer()
+while(i <= length(names(testing.file))){
+
+      if(identical(testing.file[1,i],NA)==TRUE){
+
+         col.location  <- append(col.location ,i)
+      }
+      i <- i + 1
+}
+```
+#10-fold cross-validation
+```{r}
+set.seed(123)
+folds <- createFolds(training.file$classe , k = 10)
+training <- training.file[-folds$Fold01,]
+testing <- training.file[folds$Fold01,]
+```
+Deleting the NA columns 
+```{r}
+training <- training[,-col.location]
+testing <- testing[,-col.location]
+testing.file <- testing.file[,-col.location]
+```
+Deleting the 1,2 columns 
+```{r}
+training <- training[,-c(1,2)]
+testing <- testing[,-c(1,2)]
+testing.file <- testing.file[,-c(1,2)]
+```
+#3. Prediction Analysis Model
+#Using randomForest method
+```{r}
+modFit.1 <- randomForest(classe ~., data = training)
+confusionMatrix(predict(modFit.1 , testing , type ="class") , testing$classe)
+```
+ouf of sample error is
+```{r}
+1-as.numeric(confusionMatrix(predict(modFit.1 , testing , type ="class") , testing$classe)$overall['Accuracy'])
+```
+#Using Decision Tree method
+```{r}
+modFit.2 <- rpart(classe ~ ., data = training, method="class")
+confusionMatrix(predict(modFit.2 , testing , type ="class") , testing$classe)
+```
+ouf of sample error is
+```{r}
+1-as.numeric(confusionMatrix(predict(modFit.2 , testing , type ="class") , testing$classe)$overall['Accuracy'])
+```
+#Using lda method
+```{r}
+modFit.3 <- train(classe ~ ., data = training , method = "lda")
+confusionMatrix(predict(modFit.3 , testing) , testing$classe)
+```
+ouf of sample error is
+```{r}
+1-as.numeric(confusionMatrix(predict(modFit.3 , testing) , testing$classe)$overall['Accuracy'])
+```
+#4. Conclusion 
+Since the out of sample error of random forest model is the smallest of all three models, we can see the 
+random forest model best fit in this case.
